@@ -1,0 +1,4 @@
+#AuthName "www.miw.com"
+#AuthType Basic
+#AuthUserFile "C:\xampp\Practica1\passwords"
+#Require valid-user
