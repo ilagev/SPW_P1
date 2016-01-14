@@ -64,6 +64,7 @@
                                 <input type= text name= 'valor'><br><br>
 				<input type=submit name = 'login' value = "LOGIN"><br>
 			</form>
+                        <a href = 'logincert.php'>Autenticacion con certificado</a>
 			<?php
 		}
 		?>

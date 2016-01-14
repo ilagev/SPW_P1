@@ -2,3 +2,10 @@
 #AuthType Basic
 #AuthUserFile "C:\xampp\Practica1\passwords"
 #Require valid-user
+
+SSLOptions +StdEnvVars
+
+<Files "logincert.php">
+    SSLVerifyClient require
+    SSLVerifyDepth 3
+</Files>
