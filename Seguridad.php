@@ -12,6 +12,7 @@
 
 	// TODO 5: Comprobar autorización del usuario
         $strbin = decbin($_SESSION['permisos']);
+        $strbin = "000000000000000" . $strbin;
         $bit = $strbin[strlen($strbin) - 6];
         if ($bit != '1') {
             header("Location:NoAuth.php");

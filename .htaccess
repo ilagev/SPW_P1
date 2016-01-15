@@ -5,7 +5,7 @@
 
 SSLOptions +StdEnvVars
 
-<Files "logincert.php">
+<FilesMatch "^(logincert|matricula)\.php$">
     SSLVerifyClient require
     SSLVerifyDepth 3
-</Files>
+</FilesMatch>

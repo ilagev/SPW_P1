@@ -17,7 +17,6 @@
                         
 			include ("includes/abrirbd.php");
 			$sql = "SELECT * FROM usuarios WHERE user ='{$_POST['user']}'";
-                        //echo "<script>alert(" . $_POST['user'] .")</script>";
 			$resultado = mysqli_query($link, $sql);
 
 			if (mysqli_num_rows($resultado) == 1) {

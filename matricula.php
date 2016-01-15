@@ -47,7 +47,36 @@
 				// TODO 12: comprobar que el usuario firmante coincide con el usuario autenticado	
 
 				// TODO 11: matricular al usuario en las asignaturas seleccionadas en el formulario
-				// if (isset($_POST['SPW'])) ...
+                                $user = $_SERVER['SSL_CLIENT_S_DN_CN'];
+                                include ("includes/abrirbd.php");
+                                $sql = "SELECT * FROM usuarios WHERE user ='{$user}'";
+                                $resultado = mysqli_query($link, $sql);
+                                $num_rows = mysqli_num_rows($resultado);
+                                if ($num_rows == 1) {
+                                    $usuario = mysqli_fetch_assoc($resultado);
+                                    $strbin = decbin($usuario['permisos']);
+                                    $strbin = "000000000000000" . $strbin;
+                                    if (isset($_POST['SPW'])) {
+                                        $strbin[strlen($strbin) - 6] = '1';
+                                    }
+                                    if (isset($_POST['DAWTP'])) {
+                                        $strbin[strlen($strbin) - 5] = '1';
+                                    }
+                                    if (isset($_POST['DAWDCA'])) {
+                                        $strbin[strlen($strbin) - 4] = '1';
+                                    }
+                                    $intbin = bindec($strbin);
+                                    $update_sql = "UPDATE usuarios SET permisos='{$intbin}'WHERE user='{$user}'";
+                                    if (mysqli_query($link, $update_sql)) {
+                                        echo "Record updated successfully";
+                                    } else {
+                                        echo "Error updating record: " . mysqli_error($link);
+                                    }
+                                    mysqli_close($link);
+                                    $_SESSION['permisos'] = $intbin;
+                                } else {
+                                    echo "<CENTER> <H2><FONT color=red> HA OCURRIDO UN ERROR";
+                                }
 			}
 			?>
 			<br><br><A href= 'MasterWeb.php'> Volver a inicio </A>
