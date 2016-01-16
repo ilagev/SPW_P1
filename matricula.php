@@ -44,38 +44,51 @@
 				echo "<CENTER> <H2><FONT color=red> COMPROBACIÓN DE FIRMA INCORRECTA";
 			} else {
 				echo "<CENTER> <H2>FIRMA CORRECTA</H2><BR>";
-				// TODO 12: comprobar que el usuario firmante coincide con el usuario autenticado	
-
-				// TODO 11: matricular al usuario en las asignaturas seleccionadas en el formulario
                                 $user = $_SERVER['SSL_CLIENT_S_DN_CN'];
-                                include ("includes/abrirbd.php");
-                                $sql = "SELECT * FROM usuarios WHERE user ='{$user}'";
-                                $resultado = mysqli_query($link, $sql);
-                                $num_rows = mysqli_num_rows($resultado);
-                                if ($num_rows == 1) {
-                                    $usuario = mysqli_fetch_assoc($resultado);
-                                    $strbin = decbin($usuario['permisos']);
-                                    $strbin = "000000000000000" . $strbin;
-                                    if (isset($_POST['SPW'])) {
-                                        $strbin[strlen($strbin) - 6] = '1';
-                                    }
-                                    if (isset($_POST['DAWTP'])) {
-                                        $strbin[strlen($strbin) - 5] = '1';
-                                    }
-                                    if (isset($_POST['DAWDCA'])) {
-                                        $strbin[strlen($strbin) - 4] = '1';
-                                    }
-                                    $intbin = bindec($strbin);
-                                    $update_sql = "UPDATE usuarios SET permisos='{$intbin}'WHERE user='{$user}'";
-                                    if (mysqli_query($link, $update_sql)) {
-                                        echo "Record updated successfully";
-                                    } else {
-                                        echo "Error updating record: " . mysqli_error($link);
-                                    }
-                                    mysqli_close($link);
-                                    $_SESSION['permisos'] = $intbin;
+                                
+				// TODO 12: comprobar que el usuario firmante coincide con el usuario autenticado	
+                                $rutaCert = "tmp/cert_" . $numero . ".pem";
+                                $comando = "c:/xampp/apache/bin/openssl pkcs7 -in $nombreFirma";
+                                $comando .= " -print_certs -out $rutaCert";
+                                exec ($comando);
+                                
+                                $certificado = file_get_contents($rutaCert);
+                                $arrayCert = openssl_x509_parse($certificado);
+                                
+                                if ($arrayCert['subject']['CN'] != $user) {
+                                    echo "<h2><font color=\"red\">Usuario incorrecto. La firma debe realizarla el usuario autenticado: " . $user;
+                                    echo "<br><br>No se ha realizado la matrícula</font></h2>";
                                 } else {
-                                    echo "<CENTER> <H2><FONT color=red> HA OCURRIDO UN ERROR";
+                                   // TODO 11: matricular al usuario en las asignaturas seleccionadas en el formulario
+                                   include ("includes/abrirbd.php");
+                                   $sql = "SELECT * FROM usuarios WHERE user ='{$user}'";
+                                   $resultado = mysqli_query($link, $sql);
+                                   $num_rows = mysqli_num_rows($resultado);
+                                   if ($num_rows == 1) {
+                                       $usuario = mysqli_fetch_assoc($resultado);
+                                       $strbin = decbin($usuario['permisos']);
+                                       $strbin = "000000000000000" . $strbin;
+                                       if (isset($_POST['SPW'])) {
+                                           $strbin[strlen($strbin) - 6] = '1';
+                                       }
+                                       if (isset($_POST['DAWTP'])) {
+                                           $strbin[strlen($strbin) - 5] = '1';
+                                       }
+                                       if (isset($_POST['DAWDCA'])) {
+                                           $strbin[strlen($strbin) - 4] = '1';
+                                       }
+                                       $intbin = bindec($strbin);
+                                       $update_sql = "UPDATE usuarios SET permisos='{$intbin}'WHERE user='{$user}'";
+                                       if (mysqli_query($link, $update_sql)) {
+                                           echo "Matrícula realizada correctamente";
+                                       } else {
+                                           echo "Error updating record: " . mysqli_error($link);
+                                       }
+                                       mysqli_close($link);
+                                       $_SESSION['permisos'] = $intbin;
+                                   } else {
+                                       echo "<CENTER> <H2><FONT color=red> HA OCURRIDO UN ERROR";
+                                   }   
                                 }
 			}
 			?>
